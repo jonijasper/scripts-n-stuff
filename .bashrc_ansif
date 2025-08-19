@@ -1,0 +1,141 @@
+#
+# ~/.bashrc_ansif
+#
+
+###############################
+### ANSI color escape codes ###
+###############################
+#
+# https://en.wikipedia.org/wiki/ANSI_escape_code
+#
+
+function ansinumber {
+    #shopt -s extglob
+    #local isnum=+([[:digit:]])
+    local foo="$1"
+    [[ "$foo" =~ ^[0-9]+$ ]] && foo='x'
+    case "$foo" in
+    #   c | color   | st | style     )
+        k | black   | nl | normal    )   printf '0';;
+        r | red     | bb | bold      )   printf '1';;
+        g | green   | dm | dim       )   printf '2';;
+        y | yellow  | it | italic    )   printf '3';;
+        b | blue    | ul | underline )   printf '4';;
+        m | magenta | bl | blink     )   printf '5';;
+        c | cyan                     )   printf '6';;
+        w | white   | rv | reverse   )   printf '7';;
+        x | rgb                      )   printf '8';;
+        d | default | st | strike    )   printf '9';; 
+        *)  echo "invalid arg: '$1'" >&2; return 1;;
+    esac
+}
+
+function ansi-format {
+    local exitcode=0
+    local ansireset='\e[m'
+    # If no arguments, send reset code
+    if [[ $# == 0 ]]; then
+        printf '%s' $ansireset 
+        return $exitcode
+    fi 
+
+    local dryrun=false
+    local OPTIND flag fgcolor bgcolor style undo bright
+    while getopts :c:b:s:-:d flag
+    do
+        case "$flag" in
+            d)  dryrun=true;;
+            c)  fgcolor=$OPTARG;;
+            b)  bgcolor=$OPTARG;;
+            s)  style=$OPTARG;;
+            -)  # long formats --flag=arg
+                local _opt _arg
+                IFS='=' read -r _opt _arg <<< "$OPTARG"
+                [[ -z "$_arg" ]] && _arg=true 
+                case "$_opt" in 
+                    undo)  undo="$_arg";;
+                  bright)  bright="$_arg";;
+                esac
+                unset _opt _arg
+                ;;
+            :)  # flag without arg -> set defaults
+                case "$OPTARG" in
+                    c)  fgcolor=default;;
+                    b)  bgcolor=default;;
+                    s)  style=normal;;
+                esac
+                ;;
+        esac
+    done
+    shift $(($OPTIND - 1))
+    local content="$@"
+
+    local codelist=()
+    if [[ -n "$undo" ]]; then
+        undo=$(ansinumber $undo)
+        case "$undo" in
+            3 | 4 | 7)  codelist+=("2$undo");;
+                    *)  codelist+=("0");;
+        esac
+    fi    
+
+    if [[ -n "$style" ]]; then
+        codelist+=("$(ansinumber $style)")
+    fi
+
+    local col cond1 cond2 pre
+    if [[ -n "$fgcolor" ]]; then
+        #printf -v col '%s' $(ansinumber $fgcolor)
+        col=$(ansinumber $fgcolor)
+        if [[ -z "$col" ]]; then
+            exitcode+=1
+        elif [[ "$col" == '8' ]]; then
+            codelist+=("38;5;$fgcolor")
+        else
+            pre=3
+            if [[ -n "$bright" ]]; then
+                cond1=[[ "$fgcolor" != "default" ]]
+                cond2=[[ "$bright" =~ !(bg|background) ]]
+                if $cond1 && $cond2; then
+                    pre=9
+                fi
+            fi
+            codelist+=("$pre$col")
+        fi
+    fi
+
+    if [[ -n "$bgcolor" ]]; then
+        col=$(ansinumber $bgcolor)
+        if [[ "$col" == '8' ]]; then
+            codelist+=("48;5;$bgcolor")
+        else
+            pre=4
+            if [[ -n "$bright" ]]; then
+                cond1=[[ "$bgcolor" != "default" ]]
+                cond2=[[ "$bright" =~ ?(bg|background) ]]
+                if $cond1 && $cond2; then
+                    pre=10
+                fi
+            fi
+            codelist+=("$pre$col")
+        fi
+    fi
+
+    local codestr="\e[$(IFS=';'; printf '%s' "${codelist[*]}")m"
+    if [[ "$dryrun" == "true" ]]; then
+        if [[ -n "$content" ]]; then
+            printf '%s' $codestr $content $ansireset >&2
+        else
+            printf '%s' $codestr >&2
+        fi
+    else
+        if [[ -n "$content" ]]; then
+            printf '%s' $codestr $content $ansireset
+        else
+            printf '%s' $codestr
+        fi
+        
+    fi
+    return $exitcode
+}
+

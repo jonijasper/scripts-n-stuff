@@ -1,0 +1,51 @@
+#
+# ~/.bashrc_alias
+#
+
+## META
+alias sudo='sudo '
+alias which='which '
+
+## SAFETY
+alias rm='rm -vI --preserve-root'
+alias chown='chown -v --preserve-root'
+alias chmod='chmod -v --preserve-root'
+alias chgrp='chgrp -v --preserve-root'
+
+## OPTIONS
+alias dir='dir --color=auto'
+alias vdir='vdir --color=auto'
+alias ls='ls -ANv --group-directories-first --color=auto'
+alias ll='ls -lhg --color=always'
+alias less='less -R'
+alias watch='watch -d -n 1 '
+
+## GREPS
+alias grep='grep -i --color=auto'
+alias fgrep='grep -F --color=auto'
+alias egrep='grep -E --color=auto'
+alias pgrep='grep -P --color=auto'
+
+## LAZY
+alias py='python3'
+alias pip='pip3'
+alias mull='nohup mullvad-browser &'
+alias jctl='journalctl -exb'
+alias jctl-last='journalctl -xn'
+alias vimrc='$EDITOR $HOME/.vimrc'
+alias bashrc='$EDITOR $HOME/.bashrc'
+alias funcsrc='$EDITOR $HOME/.bashrc_funcs'
+alias aliasrc='$EDITOR $HOME/.bashrc_alias'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ......='cd ../../../../..'
+
+## MISC
+alias rb='. ~/.bashrc'
+alias fb='clear && . ~/.bashrc'
+alias restart-plasma='killall plasmashell && kstart5 plasmashell'
+alias paccache-show='paccache -duvk1 && paccache -dvk2'
+alias paccache-rm='paccache -ruvk1 && paccache -rvk2'
+

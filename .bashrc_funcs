@@ -1,0 +1,119 @@
+#
+# ~/.bashrc_funcs
+#
+
+function get-splashed {
+# screenfetch opts: distro host kernel uptime pkgs shell res de wm wmtheme gtk disk cpu gpu mem
+    case "$1" in
+        yall)
+            if [[ $COLUMNS -le 100 ]]; then
+                screenfetch -p
+            else
+                screenfetch
+            fi
+            ;;
+
+        *)
+            if [[ $COLUMNS -le 100 ]]; then
+                screenfetch -d -pkgs,res,de,wm,wmtheme,gtk -p
+            else
+                screenfetch -d -pkgs,res,de,wm,wmtheme,gtk 
+            fi
+            ;;
+    esac
+}
+
+function get-prompted {
+    # non printables inside \[ \]
+    # or \001 \002 for printf ???
+    #
+    printf -v goat '%b' '\U1f410'
+    #local goat='\U0001f410'
+
+    if [[ -n "$(command -v ansi-format)" ]]; then
+        local sres="\[$(ansi-format)\]"
+        local col1="\[$(ansi-format -s bold -c cyan)\]"
+        local col2="\[$(ansi-format -c blue)\]"
+        local col3="\[$(ansi-format -s bold -c white)\]"
+        local col4="\[$(ansi-format -s bold -c magenta)\]"
+        local col5="\[$(ansi-format -s bold -c yellow)\]"
+        local revr="\[$(ansi-format -s reverse)\]"
+    fi
+    
+    case "$1" in
+
+           ebin)    printf ':$? >$BASH_COMMAND\n\n\A [\\u@\h:\w]\$ %s%s' $bold $col3 
+                    ;;
+
+        eosgoat)    printf '\n%s┌───[ %s>\[$BASH_COMMAND\]%s ]─( %s\[$?\]%s )%s' $col4 $col5 $col4 $col5 $col4 $sres
+                    printf '\n%s│ %s\A %s %s\\u%s@%s\h%s:%s\w%s' $col4 $sres $goat $col1 $col2 $col1 $sres $col2 $sres
+                    printf '\n%s└─ %s\$ %s' $col4 $sres $col3
+                    ;;
+
+         oggoat)    local lines=()
+                    lines+="\n┌───( $col1\u@\h$col0 )─[ $col2\w$col0 ]"
+                    lines+="\n│ \A $goat \d"
+                    lines+="\n└─ \$ "
+                    IFS='' read -r promptstr <<< "${lines[*]}"
+                    printf '%s' "$promptstr"
+                    ;;
+
+          goat2)    printf '\n┌───( %s\\u@\h%s )─[ %s\w%s ]' $col1 $sres $col2 $sres
+                    printf '\n│ \A %s \d' $goat
+                    printf '\n└─ \$ '
+                    ;;
+
+          color)    printf '[\A] %s\\u%s@%s\h%s:%s\w%s\$ ' $col1 $col2 $col1 $sres $col2 $sres
+                    ;;
+                
+              *)    printf '[\A] \\u@\h:\w\$ '
+                    ;;
+    esac
+}
+
+# split plex browser
+function plex {
+    local plexbrowser
+    if [[ -n "$1" ]]; then
+        plexbrowser="$1"
+    elif [[ -n "$BROWSER" ]]; then
+        plexbrowser="$BROWSER"
+    else
+        plexbrowser='firefox'
+    fi
+    nohup mullvad-exclude $plexbrowser &
+}
+
+# mullvad excluded/split-tunneled processes
+function splitted {
+    local processlist="$(mullvad split-tunnel list | awk 'NR>1' | xargs -r -I _ ps -q _ -o comm=)"
+    if [[ -n "$processlist" ]]; then
+        local processnum=$(wc -l <<< "$processlist")
+        echo "mullvad excluded processes: $processnum"
+        case "$1" in
+            all)    printf '%s\n̈́' "$processlist" | sort;;
+              *)    printf '%s\n̈́' "$processlist" | sort -u;;
+        esac
+    else
+        echo "no excluded processes"
+    fi
+}
+
+# gpu runtime info
+function gpu-info {
+    local device
+    for i in {0..1}
+    do
+        device="/sys/class/drm/card$i/device"
+        echo "Driver: $(grep driver "$device/uevent")"
+        echo "power_state: $(cat $device/power_state)"
+        echo "runtime_status: $(cat $device/power/runtime_status)"
+        echo "runtime_suspended_time: $(cat $device/power/runtime_suspended_time)"
+    done
+}
+
+# show pacman cache
+#function paccache-show {
+#  paccache -duvk1 $(find ~/.cache/yay/ -mindepth 1 -maxdepth 1 -type d | xargs -r printf "-c %s ")
+#}
+

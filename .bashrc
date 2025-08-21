@@ -45,7 +45,7 @@ HISTFILESIZE=1000   # how many saved for the future
 
 ###---[ PROMPT ]---###
 # ~/.bashrc_funcs > get-prompted
-PS0='\[\e[m\]'
+PS0=$(get-prompted ps0)
 PS1=$(get-prompted eosgoat)
 
 

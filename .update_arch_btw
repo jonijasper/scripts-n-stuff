@@ -1,0 +1,73 @@
+#
+# ~/.update_arch_btw
+#
+
+function update-arch-btw {
+    if [[ "$1" =~ ^('-h'|'--help'|'help')$ ]]; then
+        echo 'update-arch-btw [browser]'
+        echo 'update-arch-btw [-h|--help|help]'
+        echo '***'
+        echo '[browser] is optional and the BROWSER environment variable, if set, is used as a default.'
+        echo 
+        echo 'example usage:'
+        echo '1. $ update-arch-btw'
+        echo '2. $ update-arch-btw chromium'
+        return
+    fi
+
+    local thebrowser=${1:-"$BROWSER"}
+    local PS3="\n(press ENTER to reprint the options)\nChoose a page to open:\n>"
+    printf -v PS3 '%b' "$PS3"
+
+    local -A pages
+    pages['none']=''
+    pages['all']=''
+    pages['garuda']='https://garudalinux.org/blog'
+    pages['arch']='https://archlinux.org/news/'
+    pages['aur']='https://lists.archlinux.org/archives/list/aur-general@lists.archlinux.org/latest'
+    local pagelist="$(printf '%s\n' "${!pages[@]}" | sort)"
+
+    local browserlist=('firefox' 'chromium' 'mullvad-browser' 'librewolf' 'other')
+    local updatefuncs=('yay' 'pacman -Syu' 'garuda-update' 'skip')
+
+    local webpage
+    select webpage in $pagelist
+    do
+        [[ -z "$webpage" ]] && continue
+        [[ "$webpage" == 'none' ]] && break
+
+        if [[ ! -x "$(command -v "$thebrowser")" ]]; then
+            PS3='Choose a browser: '
+            select thebrowser in "${browserlist[@]}"
+            do
+                if [[ "$thebrowser" == 'other' ]]; then
+                    read -r -p 'browser: ' thebrowser
+                fi
+                if [[ -x "$(command -v "$thebrowser")" ]]; then
+                    break
+                else
+                    echo "Could not launch $thebrowser! Try something else:"
+                fi
+            done
+            printf -v PS3 '%b' "$prompt1"
+        fi
+
+        if [[ "$webpage" == "all" ]]; then
+            $thebrowser ${pages[@]} 2>/dev/null
+            break
+        else
+            $thebrowser ${pages[$webpage]} 2>/dev/null
+        fi
+    done
+    local func
+    select func in "${updatefuncs[@]}"
+    do
+        if [[ "$func" == 'skip' ]]; then
+            break
+        elif [[ -x "$(command -v "$func")" ]]; then
+            $func
+            break
+        fi
+    done
+}
+

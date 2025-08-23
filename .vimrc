@@ -58,6 +58,9 @@ if has('syntax') && has('eval')
   packadd! matchit
 endif
 
+" If the current file type is HTML, set indentation to 2 spaces.
+autocmd Filetype html setlocal tabstop=2 shiftwidth=2 expandtab
+
 " Add numbers to each line on the left-hand side.
 set number
 set relativenumber
@@ -82,9 +85,6 @@ set scrolloff=10
 " Do not wrap lines. Allow long lines to extend as far as the line goes.
 set nowrap
 
-" While searching though a file incrementally highlight matching characters as you type.
-set incsearch
-
 " Ignore capital letters during search.
 set ignorecase
 
@@ -103,4 +103,30 @@ set showmatch
 
 " Set the commands to save in history default number is 20.
 set history=50
+
+" Enable auto completion menu after pressing TAB.
+set wildmenu
+
+" Make wildmenu behave like similar to Bash completion.
+set wildmode=list:longest
+
+" There are certain files that we would never want to edit with Vim.
+" Wildmenu will ignore files with these extensions.
+set wildignore=*.docx,*.jpg,*.png,*.gif,*.pdf,*.pyc,*.exe,*.flv,*.img,*.xlsx
+
+
+" Clear status line when vimrc is reloaded.
+"set statusline=
+
+" Status line left side.
+"set statusline+=\ %F\ %M\ %Y\ %R
+
+" Use a divider to separate the left side from the right side.
+"set statusline+=%=
+
+" Status line right side.
+"set statusline+=\ ascii:\ %b\ hex:\ 0x%B\ row:\ %l\ col:\ %c\ percent:\ %p%%
+
+" Show the status on the second to last line.
+set laststatus=2
 

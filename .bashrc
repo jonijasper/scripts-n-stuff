@@ -5,48 +5,47 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-
-###---[ ENV VARS ]---###
-BROWSER=
-EDITOR=vim
-TIME_STYLE=
-
 #use vim commands on the command line
 set -o vi 
 
-if [ -x "$(command -v links)" ]; then
-    BROWSER='links'
-elif [ -x "$(command -v mullvad-browser)" ]; then
-    BROWSER='mullvad-browser'
-elif [ -x "$(command -v firefox)" ]; then
-    BROWSER='firefox'
-fi
 
-# ls -l default time format
-form1=' %_d. %b  %Y ***'
-form2=' %_d. %b %_H:%M ***'
-printf -v TIME_STYLE '+%s\n%s' "$form1" "$form2" 
-unset form1 form2
+###---[ IMPORTS ]---### 
+#
+[[ -f ~/.bashrc_ansif ]] && . ~/.bashrc_ansif
+[[ -f ~/.bashrc_promp ]] && . ~/.bashrc_promp
+[[ -f ~/.bashrc_funcs ]] && . ~/.bashrc_funcs
+[[ -f ~/.bashrc_alias ]] && . ~/.bashrc_alias
+[[ -f ~/.update_arch_btw ]] && . ~/.update_arch_btw
 
-export TIME_STYLE
+
+
+###---[ EXPORTS ]---###
+#
+export EDITOR=vim
+# ls -l 
+# FORMAT=FORMAT1<linebreak>FORMAT2
+export TIME_STYLE=+" %_d. %b  %Y ***
+ %_d. %b %_H:%M ***"
+# browsers
+[[ -x "$(command -v mullvad-browser)" ]] && export BROWSER='mullvad-browser'
+#[[ -x "$(command -v firefox)" ]] && export BROWSER='firefox'
+#[[ -x "$(command -v links)" ]] && export BROWSER='links'
 
 
 ###---[ BASH HISTORY ]---###
+#
 HISTCONTROL=ignoredups
 HISTSIZE=1000   # how many commands on active session
 HISTFILESIZE=1000   # how many saved for the future
 
 
-###---[ SOURCERER ]---### 
-[[ -f ~/.bashrc_ansif ]] && . ~/.bashrc_ansif
-[[ -f ~/.bashrc_funcs ]] && . ~/.bashrc_funcs
-[[ -f ~/.bashrc_alias ]] && . ~/.bashrc_alias
-
-
 ###---[ PROMPT ]---###
-# ~/.bashrc_funcs > get-prompted
+# ~/.bashrc_promp > get-prompted
 PS0=$(get-prompted ps0)
 PS1=$(get-prompted eosgoat)
+#PS2=
+#PS3=
+#PS4=
 
 
 ###---[ SPLASH ]---### 
@@ -59,5 +58,5 @@ get-splashed
 
 
 ###---[ FUNCS ]---###
-# ~/.bashrc_funcs
+# ~/.bashrc_funcs 
 

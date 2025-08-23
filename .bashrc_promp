@@ -1,0 +1,70 @@
+#
+# ~/.bashrc_prompt
+#
+
+function get-prompted {
+    # non printables inside \[ \]
+    # or \001 \002 for printf ???
+    #
+    local goat='\U1f410' 
+    if [[ -n "$(command -v ansi-format)" ]]; then
+        local res="\[$(ansi-format)\]"
+        local dcn="\[$(ansi-format -s normal -c default)\]"
+        local dcb="\[$(ansi-format -s bold -c default)\]"
+        local cyn="\[$(ansi-format -s normal -c cyan)\]"
+        local cyb="\[$(ansi-format -s bold -c cyan)\]"
+        local whn="\[$(ansi-format -s normal -c white)\]"
+        local whb="\[$(ansi-format -s bold -c white)\]"
+        local mab="\[$(ansi-format -s bold -c magenta)\]"
+        local yeb="\[$(ansi-format -s bold -c yellow)\]"
+    fi
+    # ─ │ ┌ └ ┘ ┐ ┤ ├ ┴ ┬ ┼
+    #  ┃ ┏ ━ ┣ ┗ ┫
+    # ═ ║ ╒ ╕ ╓ ╖ ╔ ╗ ╘ ╛ ╙ ╜ ╚ ╝ ╞ ╡ ╟ ╢ ╠ ╣ ╥ ╨ ╧ ╤ ╦ ╩ ╪ ╫ ╬
+    #  ╭ ╮ ╰ ╯
+    case "$1" in
+
+        ps0)
+            printf '%s' $res 
+            ;;
+
+        eosgoat)
+            printf '%s' $mab
+            printf '┌( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
+            printf '│\n'
+            printf '├┤%s\A%s├─(%s\\u%s@%s\h%s)\n%s' $cyn $mab $cyb $dcb $cyb $mab $mab
+            printf '└─ %b%s\w\$ %s' $goat $dcn $dcb
+            ;;
+        
+        eosgoat2)
+            printf '%s' $mab
+            printf '┌─( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
+            printf '│\n'
+            printf '├┤%s\\u%s@%s\h%s├─( %s\w %s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
+            printf '└────(%s\A%s)────┘%b%s\$ %s' $cyn $mab $goat $dcn $dcb
+            ;;
+
+        spagoatti)
+            printf '%s' $mab
+            printf '└─┬─( %s>\[$BASH_COMMAND\]%s )─[ %s\[$?\]%s ]\n' $yeb $mab $yeb $mab 
+            printf '%b└──────────────┐\n' $goat
+            printf '┌─%s\\u%s@%s\h%s─┴─(%s\w%s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
+            printf '├[%s\A%s]─%s\$ %s' $cyn $mab $dcn $dcb
+            ;;
+
+        goat)
+            printf '\n┌───[ %s\\u@\h%s ]─( %s\w%s )' $cyn $sres $cyn $sres
+            printf '\n│ \A %s \d' $goat
+            printf '\n└─ \$ '
+            ;;
+
+        color)
+            printf '[\A]%s\\u%s@%s\h%s:\w\$ ' $cyn $res $cyn $res
+            ;;
+            
+        *)
+            printf '[\A]\\u@\h:\w\$ '
+            ;;
+    esac
+}
+

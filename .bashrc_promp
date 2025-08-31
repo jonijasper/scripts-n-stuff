@@ -28,20 +28,20 @@ function get-prompted {
             printf '%s' $res 
             ;;
 
-        eosgoat)
+        eosgoat2)
             printf '%s' $mab
             printf '┌( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
             printf '│\n'
             printf '├┤%s\A%s├─(%s\\u%s@%s\h%s)\n%s' $cyn $mab $cyb $dcb $cyb $mab $mab
-            printf '└─ %b%s\w\$ %s' $goat $dcn $dcb
+            printf '└─ %b%s\W\$ %s' $goat $dcn $dcb
             ;;
         
-        eosgoat2)
+        eosgoat)
             printf '%s' $mab
             printf '┌─( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
             printf '│\n'
-            printf '├┤%s\\u%s@%s\h%s├─( %s\w %s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
-            printf '└────(%s\A%s)────┘%b%s\$ %s' $cyn $mab $goat $dcn $dcb
+            printf '├┤%s\\u%s@%s\h%s├─(%s\w%s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
+            printf '└─(%s\A%s)%b%s\$ %s' $cyn $mab $goat $dcn $dcb
             ;;
 
         spagoatti)
@@ -53,17 +53,17 @@ function get-prompted {
             ;;
 
         goat)
-            printf '\n┌───[ %s\\u@\h%s ]─( %s\w%s )' $cyn $sres $cyn $sres
-            printf '\n│ \A %s \d' $goat
+            printf '\n┌───[ %s\\u@\h%s ]─( %s\w%s )' $cyn $res $cyn $res
+            printf '\n│ \A %b \d' $goat
             printf '\n└─ \$ '
             ;;
 
         color)
-            printf '[\A]%s\\u%s@%s\h%s:\w\$ ' $cyn $res $cyn $res
+            printf '[\A]%s\\u%s@%s\h%s:\W\$ ' $cyn $res $cyn $res
             ;;
             
         *)
-            printf '[\A]\\u@\h:\w\$ '
+            printf '[\A]\\u@\h:\W\$ '
             ;;
     esac
 }

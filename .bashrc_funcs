@@ -3,24 +3,18 @@
 #
 
 function get-splashed {
-# screenfetch opts: distro host kernel uptime pkgs shell res de wm wmtheme gtk disk cpu gpu mem
-    case "$1" in
-        yall)
-            if [[ $COLUMNS -le 100 ]]; then
-                screenfetch -p
-            else
-                screenfetch
-            fi
-            ;;
-
-        *)
-            if [[ $COLUMNS -le 100 ]]; then
-                screenfetch -d -pkgs,res,de,wm,wmtheme,gtk -p
-            else
-                screenfetch -d -pkgs,res,de,wm,wmtheme,gtk 
-            fi
-            ;;
-    esac
+    # screenfetch opts:
+    # distro host kernel uptime pkgs shell res de wm wmtheme gtk disk cpu gpu mem
+    local opts
+    if [[ -z "$1" ]]; then
+        opts='-d -pkgs,res,de,wm,wmtheme,gtk'
+    elif [[ "$1" == 'all' ]]; then
+        opts=''
+    else
+        opts="$@"
+    fi
+    # portrait || normal
+    [[ $COLUMNS -le 100 ]] && screenfetch $opts -p || screenfetch $opts
 }
 
 # split plex browser
@@ -36,50 +30,32 @@ function plex {
     nohup mullvad-exclude $plexbrowser &
 }
 
-# mullvad excluded/split-tunneled processes
+# mullvad split-tunneled processes
 function splitted {
+    # pid list | skip first line | ps: pid -> command
     local processlist="$(mullvad split-tunnel list | awk 'NR>1' | xargs -r -I _ ps -q _ -o comm=)"
-    if [[ -n "$processlist" ]]; then
-        local processnum=$(wc -l <<< "$processlist")
-        echo "mullvad excluded processes: $processnum"
-        case "$1" in
-            all)    printf '%s\n' "$processlist" | sort;;
-              *)    printf '%s\n' "$processlist" | sort -u;;
-        esac
+    [[ -z "$processlist" ]] && echo "no excluded processes" && return
+
+    printf '%s excluded processes:\n' $(wc -l <<< "$processlist") # linecount
+    if [[ "$1" == 'all' ]]; then
+        sort <<< "$processlist"
     else
-        echo "no excluded processes"
+        sort -u <<< "$processlist"
     fi
 }
 
-# gpu runtime info
-function gpu-info {
-    local device
-    for i in {0..1}
-    do
-        device="/sys/class/drm/card$i/device"
-        echo "Driver: $(grep driver "$device/uevent")"
-        echo "power_state: $(cat $device/power_state)"
-        echo "runtime_status: $(cat $device/power/runtime_status)"
-        echo "runtime_suspended_time: $(cat $device/power/runtime_suspended_time)"
-    done
+# find and open rc/config files 
+function editrc {
+    local pattern
+    case "$1" in
+          bash) pattern='.*(\bbash|bash\b).*';;
+        bashrc) pattern='.*(\bbashrc|bashrc\b).*';;
+            -p) [[ -n "$2" ]] && pattern="$2" || read -r -p 'pattern=' pattern;;
+             *) pattern='.*(\brc|rc\b|_rc|rc_).*'
+    esac
+    local rcfiles="$(find ~/ -maxdepth 1 -regextype egrep -iregex "$pattern" -printf '%f\n')"
+    local rc REPLY IFS=$'\n'
+    select rc in $(sort <<< "$rcfiles"); do break; done
+    ${EDITOR:-'vi'} ~/"$rc"
 }
-
-# rc edit helper
-function rcedit {
-    local pattern='.*(\brc|rc\b|_rc|rc_).*'
-    if [[ "$1" == 'bash' ]]; then
-        pattern='.*(\bbash|bash\b).*'
-    fi
-    local rcfiles="$(find ~/ -maxdepth 1 -regextype egrep -iregex $pattern -printf '%f\n')"
-    local IFS=$'\n'
-    local rc REPLY
-    select rc in $rcfiles; do break; done
-    [[ -f ~/"$rc" ]] && ${EDITOR:-'vi'} ~/"$rc"
-}
-
-
-# show pacman cache
-#function paccache-show {
-#  paccache -duvk1 $(find ~/.cache/yay/ -mindepth 1 -maxdepth 1 -type d | xargs -r printf "-c %s ")
-#}
 

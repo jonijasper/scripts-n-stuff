@@ -42,7 +42,6 @@ get-splashed
 
 ###---[ ALIAS ]---###
 # ~/.bashrc_alias
-alias wc3='cd ~/Games/warcraft-iii/drive_c/users/kansbar/Documents/Warcraft\ III/CustomKeyBindings'
 
 ###---[ FUNCS ]---###
 # ~/.bashrc_funcs 

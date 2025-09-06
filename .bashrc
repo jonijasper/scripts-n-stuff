@@ -52,7 +52,6 @@ PS1=$(get-prompted iknowwhoiam)
 
 #--[[ ALIAS ]]--
 # ~/.bashrc_alias
-alias wc3="cd ~/Games/warcraft-iii-the-frozen-throne/drive_c/users/$USER/Documents/Warcraft\ III/CustomKeyBindings"
 
 #--[[ FUNCS ]]--
 # ~/.bashrc_funcs 

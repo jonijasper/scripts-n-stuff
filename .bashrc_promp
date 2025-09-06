@@ -2,11 +2,17 @@
 # ~/.bashrc_prompt
 #
 
+#  
+# non printables inside \[ \]
+# or \001 \002 for printf ???
+#
+# ─ │ ┌ └ ┘ ┐ ┤ ├ ┴ ┬ ┼
+#  ┃ ┏ ━ ┣ ┗ ┫
+# ═ ║ ╒ ╕ ╓ ╖ ╔ ╗ ╘ ╛ ╙ ╜ ╚ ╝ ╞ ╡ ╟ ╢ ╠ ╣ ╥ ╨ ╧ ╤ ╦ ╩ ╪ ╫ ╬
+#  ╭ ╮ ╰ ╯
+#
 function get-prompted {
-    # non printables inside \[ \]
-    # or \001 \002 for printf ???
-    #
-    local goat='\U1f410' 
+    # colors
     if [[ -n "$(command -v ansi-format)" ]]; then
         local res="\[$(ansi-format)\]"
         local dcn="\[$(ansi-format -s normal -c default)\]"
@@ -18,27 +24,28 @@ function get-prompted {
         local mab="\[$(ansi-format -s bold -c magenta)\]"
         local yeb="\[$(ansi-format -s bold -c yellow)\]"
     fi
-    # ─ │ ┌ └ ┘ ┐ ┤ ├ ┴ ┬ ┼
-    #  ┃ ┏ ━ ┣ ┗ ┫
-    # ═ ║ ╒ ╕ ╓ ╖ ╔ ╗ ╘ ╛ ╙ ╜ ╚ ╝ ╞ ╡ ╟ ╢ ╠ ╣ ╥ ╨ ╧ ╤ ╦ ╩ ╪ ╫ ╬
-    #  ╭ ╮ ╰ ╯
+    # the goat
+    local goat='\U1f410'
     case "$1" in
 
-        ps0)
-            printf '%s' $res 
+        iknowwhoiam)
+            printf '%s┌─( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $mab $yeb $mab $yeb $mab
+            printf '%s│\n' $mab
+            printf '%s├┤%s\A%s├─(%s\w%s)\n' $mab $cyn $mab $dcn $mab
+            printf '%s└─%b%s\$ %s' $mab $goat $dcn $dcb
             ;;
 
         eosgoat2)
             printf '%s' $mab
-            printf '┌( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
+            printf '┌( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab
             printf '│\n'
             printf '├┤%s\A%s├─(%s\\u%s@%s\h%s)\n%s' $cyn $mab $cyb $dcb $cyb $mab $mab
             printf '└─ %b%s\W\$ %s' $goat $dcn $dcb
             ;;
-        
+
         eosgoat)
             printf '%s' $mab
-            printf '┌─( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab 
+            printf '┌─( %s>\[$BASH_COMMAND\] %s)─[ %s\[$?\] %s]\n' $yeb $mab $yeb $mab
             printf '│\n'
             printf '├┤%s\\u%s@%s\h%s├─(%s\w%s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
             printf '└─(%s\A%s)%b%s\$ %s' $cyn $mab $goat $dcn $dcb
@@ -46,7 +53,7 @@ function get-prompted {
 
         spagoatti)
             printf '%s' $mab
-            printf '└─┬─( %s>\[$BASH_COMMAND\]%s )─[ %s\[$?\]%s ]\n' $yeb $mab $yeb $mab 
+            printf '└─┬─( %s>\[$BASH_COMMAND\]%s )─[ %s\[$?\]%s ]\n' $yeb $mab $yeb $mab
             printf '%b└──────────────┐\n' $goat
             printf '┌─%s\\u%s@%s\h%s─┴─(%s\w%s)\n%s' $cyb $dcb $cyb $mab $dcn $mab $mab
             printf '├[%s\A%s]─%s\$ %s' $cyn $mab $dcn $dcb
@@ -58,13 +65,11 @@ function get-prompted {
             printf '\n└─ \$ '
             ;;
 
-        color)
-            printf '[\A]%s\\u%s@%s\h%s:\W\$ ' $cyn $res $cyn $res
-            ;;
-            
-        *)
-            printf '[\A]\\u@\h:\W\$ '
-            ;;
+        color) printf '[\A]%s\\u%s@%s\h%s:\W\$ ' $cyn $res $cyn $res;;
+
+        ps0) printf '%s' $res;;
+
+        *) printf '[\A]\\u@\h:\W\$ '
     esac
 }
 

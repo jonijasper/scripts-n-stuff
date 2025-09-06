@@ -2,36 +2,14 @@
 # ~/.bashrc_funcs
 #
 
-function get-splashed {
-    # screenfetch opts:
-    # distro host kernel uptime pkgs shell res de wm wmtheme gtk disk cpu gpu mem
-    local opts
-    if [[ -z "$1" ]]; then
-        opts='-d -pkgs,res,de,wm,wmtheme,gtk'
-    elif [[ "$1" == 'all' ]]; then
-        opts=''
-    else
-        opts="$@"
-    fi
-    # portrait || normal
-    [[ $COLUMNS -le 100 ]] && screenfetch $opts -p || screenfetch $opts
-}
-
-# split plex browser
-function plex {
-    local plexbrowser
-    if [[ -n "$1" ]]; then
-        plexbrowser="$1"
-    elif [[ -n "$BROWSER" ]]; then
-        plexbrowser="$BROWSER"
-    else
-        plexbrowser='firefox'
-    fi
-    nohup mullvad-exclude $plexbrowser &
+# split-tunnel program
+function exclude {
+    nohup mullvad-exclude "$1" &
 }
 
 # mullvad split-tunneled processes
 function splitted {
+    # get the process list
     # pid list | skip first line | ps: pid -> command
     local processlist="$(mullvad split-tunnel list | awk 'NR>1' | xargs -r -I _ ps -q _ -o comm=)"
     [[ -z "$processlist" ]] && echo "no excluded processes" && return
@@ -57,5 +35,82 @@ function editrc {
     local rc REPLY IFS=$'\n'
     select rc in $(sort <<< "$rcfiles"); do break; done
     ${EDITOR:-'vi'} ~/"$rc"
+}
+
+# update with news
+function update-arch-btw {
+    if [[ "$1" =~ ^('-h'|'--help'|'help')$ ]]; then
+        if [[ -n "$(command -v ansi-format)" ]]; then
+            local ul="$(ansi-format -s underline)"
+            local nul="$(ansi-format --undo=underline)"
+        fi
+        printf 'Usage: update-arch-btw [-h|--help|help] [%bBROWSER%b]\n' $ul $nul 
+        printf '%s\n' 'Examples:' '$ update-arch-btw' '$ update-arch-btw chromium'
+        printf 'If %bBROWSER%b is not specified, BROWSER environment\n' $ul $nul
+        printf 'variable (if set) is used as a default.\n'
+        return
+    fi
+
+    # PAGE LIST
+    local -A pages
+    pages['all']=''
+    pages['eos']='https://forum.endeavouros.com/latest'
+    #pages['garuda']='https://garudalinux.org/blog'
+    pages['arch']='https://archlinux.org/news/'
+    pages['aur']='https://lists.archlinux.org/archives/list/aur-general@lists.archlinux.org/latest'
+    pages['none']=''
+    local pagelist="$(printf '%s\n' "${!pages[@]}" | sort)" # !pages gets the keys
+
+    # UPDATE COMMANDS
+    local -a updatefuncs
+    updatefuncs+=('yay')
+    updatefuncs+=('pacman -Syu')
+    updatefuncs+=('eos-update')
+    #updatefuncs+=('garuda-update')
+    updatefuncs+=('skip')
+
+    # BROWSERS
+    local -a browserlist
+    browserlist+=('firefox')
+    browserlist+=('chromium')
+    browserlist+=('mullvad-browser')
+    #browserlist+=('librewolf')
+    browserlist+=('other')
+    local thebrowser=${1:-"$BROWSER"}
+
+    # choose page
+    local PS3 webpage
+    printf -v PS3 '\n%s' '(press ENTER to reprint the options)' '>'
+    select webpage in $pagelist
+    do
+        [[ "$webpage" == 'none' ]] && break
+        # check the browser
+        while [[ ! -x "$(command -v "$thebrowser")" ]];
+        do
+            printf 'Could not launch %s! Try something else:' "$thebrowser"
+            select thebrowser in "${browserlist[@]}"
+            do
+                if [[ "$thebrowser" == 'other' ]]; then
+                    read -r -p 'browser: ' thebrowser
+                fi
+                break
+            done
+        done
+        # open the page(s)
+        case "$webpage" in
+            all) $thebrowser ${pages[@]} 2>/dev/null; break;;
+              *) $thebrowser ${pages[$webpage]} 2>/dev/null
+        esac
+    done
+    # start the update
+    local func
+    select func in "${updatefuncs[@]}"
+    do
+        [[ "$func" == 'skip' ]] && break
+        if [[ -x "$(command -v "$func")" ]]; then
+            $func
+            break
+        fi
+    done
 }
 

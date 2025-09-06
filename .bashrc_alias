@@ -31,20 +31,17 @@ alias pgrep='grep -P'
 ## LAZY
 alias py='python3'
 alias pip='pip3'
-alias mull='nohup mullvad-browser &'
 alias jctl='journalctl -exb'
-alias jctl-last='journalctl -xn'
 alias bashrc='editrc bashrc'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias ......='cd ../../../../..'
 
 ## MISC
 alias rb='. ~/.bashrc'
-alias fb='clear && . ~/.bashrc'
 alias restart-plasma='killall plasmashell && kstart5 plasmashell'
 alias paccache-show='paccache -duvk1 && paccache -dvk2'
 alias paccache-rm='paccache -ruvk1 && paccache -rvk2'
+alias mull='nohup mullvad-browser &'
+alias plex='exclude chromium'
 

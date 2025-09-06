@@ -10,8 +10,6 @@
 #
 
 function ansinumber {
-    #shopt -s extglob
-    #local isnum=+([[:digit:]])
     local foo="$1"
     [[ "$foo" =~ ^[0-9]+$ ]] && foo='x'
     case "$foo" in
@@ -26,7 +24,7 @@ function ansinumber {
         w | white   | rv | reverse   )   printf '7';;
         x | rgb                      )   printf '8';;
         d | default | st | strike    )   printf '9';; 
-        *)  echo "invalid arg: '$1'" >&2; return 1;;
+        *)  echo "invalid arg: '$foo'" >&2; return 1;;
     esac
 }
 

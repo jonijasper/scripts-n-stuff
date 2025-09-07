@@ -1,5 +1,5 @@
 #
-# ~/.bashrc_alias
+# ~/Documents/code/scripts/scripts-n-stuff/bashrc_alias
 #
 
 ## META
@@ -32,7 +32,7 @@ alias pgrep='grep -P'
 alias py='python3'
 alias pip='pip3'
 alias jctl='journalctl -exb'
-alias bashrc='editrc bashrc'
+alias bashrc='nvim ~/Documents/code/scripts/scripts-n-stuff/'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'

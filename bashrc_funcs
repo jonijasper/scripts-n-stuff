@@ -1,5 +1,5 @@
 #
-# ~/.bashrc_funcs
+# ~/Documents/code/scripts/scripts-n-stuff/bashrc_funcs
 #
 
 # split-tunnel program
@@ -22,7 +22,7 @@ function splitted {
     fi
 }
 
-# find and open rc/config files 
+# find and open rc/config files
 function editrc {
     local pattern
     case "$1" in
@@ -34,7 +34,7 @@ function editrc {
     local rcfiles="$(find ~/ -maxdepth 1 -regextype egrep -iregex "$pattern" -printf '%f\n')"
     local rc REPLY IFS=$'\n'
     select rc in $(sort <<< "$rcfiles"); do break; done
-    ${EDITOR:-'vi'} ~/"$rc"
+    ${EDITOR:-'vi'} "$rc"
 }
 
 # update with news

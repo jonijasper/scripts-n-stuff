@@ -40,10 +40,12 @@ export TIME_STYLE=+" %_d. %b  %Y ***
  %_d. %b %_H:%M ***"
 
 #--[[ IMPORTS ]]--
-[ -f ~/.bashrc_ansif ] && . ~/.bashrc_ansif
-[ -f ~/.bashrc_promp ] && . ~/.bashrc_promp
-[ -f ~/.bashrc_funcs ] && . ~/.bashrc_funcs
-[ -f ~/.bashrc_alias ] && . ~/.bashrc_alias
+bashpath=~/Documents/code/scripts/scripts-n-stuff
+[ -f $bashpath/bashrc_ansif ] && . $bashpath/bashrc_ansif
+[ -f $bashpath/bashrc_promp ] && . $bashpath/bashrc_promp
+[ -f $bashpath/bashrc_funcs ] && . $bashpath/bashrc_funcs
+[ -f $bashpath/bashrc_alias ] && . $bashpath/bashrc_alias
+unset bashpath
 
 #--[[ PROMPT ]]--
 # ~/.bashrc_promp > get-prompted
@@ -54,5 +56,5 @@ PS1=$(get-prompted iknowwhoiam)
 # ~/.bashrc_alias
 
 #--[[ FUNCS ]]--
-# ~/.bashrc_funcs 
+# ~/.bashrc_funcs
 

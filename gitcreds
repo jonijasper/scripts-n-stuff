@@ -1,0 +1,46 @@
+#! /usr/bin/bash
+
+[[ "$1" != 'get' ]] && exit
+
+host=''
+user=''
+while read line
+do
+    key=${line%%=*}
+    if [[ "$key" == 'host' ]]; then
+        host="${line#*=}"
+    elif [[ "$key" == 'username' ]]; then
+        user="${line#*=}"
+    fi
+done
+if [[ -z "$host" ]]; then
+    echo 'ERROR: host??' >&2
+    exit
+fi
+
+creds=$(echo "host=$host" | git credential-cache get)
+if [[ -n "$creds" ]]; then
+    printf "$creds"
+else
+    bwstatus=$(bw status | jq -r .status)
+    case "$bwstatus" in
+        locked)
+            BW_SESSION=$(bw unlock --raw < /dev/tty)
+            ;;
+        unauthenticated)
+            BW_SESSION=$(bw login --raw < /dev/tty)
+            ;;
+    esac
+    if [[ -z "$BW_SESSION" ]]; then
+        echo 'ERROR: bw session??' >&2
+        exit
+    else
+        export BW_SESSION
+    fi
+
+    id='ea41c44c-0702-4da6-b084-b10a009cedc1'
+    field='.fields[0].value'
+    pass=$(bw get item $id | jq -r $field)
+    (echo "host=$host"; echo "username=$user"; echo "password=$pass") | git credential-cache store
+    echo "password=$pass"
+fi

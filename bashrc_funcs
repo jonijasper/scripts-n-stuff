@@ -59,7 +59,6 @@ function update-arch-btw {
     pages['arch']='https://archlinux.org/news/'
     pages['aur']='https://lists.archlinux.org/archives/list/aur-general@lists.archlinux.org/latest'
     pages['none']=''
-    local pagelist="$(printf '%s\n' "${!pages[@]}" | sort)" # !pages gets the keys
 
     # UPDATE COMMANDS
     local -a updatefuncs
@@ -81,7 +80,8 @@ function update-arch-btw {
     # choose page
     local PS3 webpage
     printf -v PS3 '\n%s' '(press ENTER to reprint the options)' '>'
-    select webpage in $pagelist
+    #select webpage in "${!pages[@]}"   # bash
+    select webpage in "${(@k)pages}"    # zsh
     do
         [[ "$webpage" == 'none' ]] && break
         # check the browser

@@ -2,6 +2,31 @@
 # ~/Documents/code/scripts/scripts-n-stuff/bashrc_funcs
 #
 
+# wacom config
+function wacom-config {
+    local tabletsize='576x360' # 1:1 mapping
+    local fullscreen='1920x1080'
+    local fulldesktop='1920x2160'
+    local -A position
+    position['main']="$tabletsize+980+1225"
+    position['top']="$tabletsize+980+105"
+    position['main fs']="$fullscreen+0+1080"
+    position['top fs']="$fullscreen+0+0"
+    position['full']="$fulldesktop+0+0"
+    local PS3 screen
+    printf -v PS3 '\n%s' 'Select screen:' '>'
+    select screen in "${!position[@]}" # bash
+    #select screen in "${(@k)position}" # zsh
+    do
+        if [[ "$screen" == 'full' ]]; then
+            xsetwacom --set 15 Rotate ccw
+        else
+            xsetwacom --set 15 Rotate half
+        fi
+        xsetwacom --set 15 MapToOutput ${position[$screen]}
+        break
+    done
+}
 # split-tunnel program
 function exclude {
     nohup mullvad-exclude "$1" &
@@ -80,8 +105,8 @@ function update-arch-btw {
     # choose page
     local PS3 webpage
     printf -v PS3 '\n%s' '(press ENTER to reprint the options)' '>'
-    #select webpage in "${!pages[@]}"   # bash
-    select webpage in "${(@k)pages}"    # zsh
+    #select webpage in "${(@k)pages}"    # zsh
+    select webpage in "${!pages[@]}"   # bash
     do
         [[ "$webpage" == 'none' ]] && break
         # check the browser
